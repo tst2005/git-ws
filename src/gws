@@ -317,7 +317,7 @@ git_fetch() {
     cmd=( "git" "fetch" )
 
     # Execute the command
-    if ! output=$(cd "$1" && "${cmd[@]}" 2>&1); then
+    if ! output=$(cd -- "$1" && "${cmd[@]}" 2>&1); then
         return 1
     fi
 
@@ -336,7 +336,7 @@ git_fetch_update() {
     cmd=( "git" "fetch" "origin" "$2:$2")
 
     # Execute the command
-    if ! output=$(cd "$1" && "${cmd[@]}" 2>&1); then
+    if ! output=$(cd -- "$1" && "${cmd[@]}" 2>&1); then
         return 1
     fi
 
@@ -355,7 +355,7 @@ git_fast_forward() {
     cmd=( "git" "pull" "--ff-only" )
 
     # Execute the command
-    if ! output=$(cd "$1" && "${cmd[@]}" 2>&1); then
+    if ! output=$(cd -- "$1" && "${cmd[@]}" 2>&1); then
         return 1
     fi
 
@@ -374,7 +374,7 @@ git_add_upstream() {
     cmd=( "git" "remote" "add" "upstream" "$2")
 
     # Run the command and print the output in case of error
-    if ! output=$(cd "$1" && "${cmd[@]}"); then
+    if ! output=$(cd -- "$1" && "${cmd[@]}"); then
         echo "$output"
         return 1
     fi
@@ -390,7 +390,7 @@ git_remote() {
     cmd=( "git" "remote" "-v" )
 
     # Run the command and print the output
-    (cd "$1" && "${cmd[@]}" | grep "$2" | head -n 1 | cut -d' ' -f1 | cut -d'	' -f 2 | tr -d ' ')
+    (cd -- "$1" && "${cmd[@]}" | grep "$2" | head -n 1 | cut -d' ' -f1 | cut -d'	' -f 2 | tr -d ' ')
 
     return 0
 }
@@ -403,7 +403,7 @@ git_branch() {
     cmd=( "git" "branch" )
 
     # Run the command and print the output
-    (cd "$1" && "${cmd[@]}" | grep "*" | cut -d'*' -f 2 | tr -d ' ')
+    (cd -- "$1" && "${cmd[@]}" | grep "*" | cut -d'*' -f 2 | tr -d ' ')
 
     return 0
 }
@@ -416,7 +416,7 @@ git_branches() {
     cmd=( "git" "branch" )
 
     # Run the command and get the output
-    output=$(cd "$1" && "${cmd[@]}" | cut -d'*' -f 2 | tr -d ' ')
+    output=$(cd -- "$1" && "${cmd[@]}" | cut -d'*' -f 2 | tr -d ' ')
 
     # Saves to the branches array to be accessed by the caller
     branches=( $output )
@@ -432,7 +432,7 @@ git_check_uncached_uncommited() {
     cmd=( "git" "diff" "--exit-code" )
 
     # Run the command, and if it succeed, return success
-    (cd "$1" && "${cmd[@]}" 2>&1 1>/dev/null) && return 0
+    (cd -- "$1" && "${cmd[@]}" 2>&1 1>/dev/null) && return 0
 
     # Otherwise return failure
     return 1
@@ -446,7 +446,7 @@ git_check_cached_uncommited() {
     cmd=( "git" "diff" "--cached" "--exit-code" )
 
     # Run the command, and if it succeed, return success
-    (cd "$1" && "${cmd[@]}" 2>&1 1>/dev/null) && return 0
+    (cd -- "$1" && "${cmd[@]}" 2>&1 1>/dev/null) && return 0
 
     # Otherwise return failure
     return 1
@@ -460,7 +460,7 @@ git_check_untracked() {
     cmd=( "git" "status" "--porcelain" )
 
     # Run the command
-    nb=$(cd "$1" && "${cmd[@]}" 2>/dev/null | grep "^??" | wc -l )
+    nb=$(cd -- "$1" && "${cmd[@]}" 2>/dev/null | grep "^??" | wc -l )
 
     # If no untracked files return success
     [[ $nb -eq 0 ]] && return 0
@@ -479,11 +479,11 @@ git_check_branch_origin() {
 
     # Execute the command to get the local hash, If it fails this is weird,
     # so... exiting
-    local_hash=$(cd "$1"; "${local_cmd[@]}" 2>/dev/null) || return 0
+    local_hash=$(cd -- "$1"; "${local_cmd[@]}" 2>/dev/null) || return 0
 
     # Execute the command to get the remote hash. If it fails, that mean there
     # is no remote branch, return special code
-    remote_hash=$(cd "$1"; "${remote_cmd[@]}" 2>/dev/null) || return 2
+    remote_hash=$(cd -- "$1"; "${remote_cmd[@]}" 2>/dev/null) || return 2
 
     # If the hashes are equal, return success
     [ $local_hash == $remote_hash ] && return 0
@@ -499,7 +499,7 @@ git_check_branch_origin() {
 # Init command
 cmd_init() {
     # Go back to start directory
-    cd "$START_PWD"
+    cd -- "$START_PWD"
 
     # Check if already a workspace
     [[ -f ${PROJECTS_FILE} ]] && echo -e "${C_RED}Already a workspace.${C_OFF}" && return 1
