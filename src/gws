@@ -42,8 +42,13 @@
 # Uncomment for Debug
 #set -x
 
+# ugly hack to detect bash or not bash ...
+ISBASH=$([ -n "$BASH_VERSION" ] && echo true || echo false)
+ISMKSH=$([ -n "$KSH_VERSION" ] && echo true || echo false)
+
+
 # Propagate fail in pipes
-set -o pipefail
+$ISBASH && set -o pipefail || true
 
 # }}}
 
@@ -107,16 +112,16 @@ fi
 # {{{ Variables declarations
 
 # Associative array containing the projects
-declare -A projects
+$ISBASH && declare -A projects || true
 
 # List of sorted projects index of the associative array
-declare -a projects_indexes
+$ISBASH && declare -a projects_indexes || true
 
 # Array containing the ignored patterns
-declare -a ignored_patterns
+$ISBASH && declare -a ignored_patterns || true
 
 # Array used to transmit the list of branches
-declare -a branches
+$ISBASH && declare -a branches || true
 
 # }}}
 
