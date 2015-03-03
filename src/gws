@@ -147,8 +147,10 @@ remove_matching() {
     local set_a set_b a b ok
 
     # Reconstruct array
-    declare -a set_a=( "${!1}" )
-    declare -a set_b=( "${!2}" )
+    $ISBASH && declare -a set_a=( "${!1}" ) || true
+    $ISBASH && declare -a set_b=( "${!2}" ) || true
+    $ISMKSH && set_a=( "${!1}" ) || true
+    $ISMKSH && set_b=( "${!2}" ) || true
 
     # Filter element in a that match a pattern in b
     for a in "${set_a[@]}"
