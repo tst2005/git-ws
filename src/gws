@@ -98,7 +98,7 @@ if [[ -t 1 ]]; then
     C_RED="\e[91m"
     C_GREEN="\e[92m"
     C_YELLOW="\e[93m"
-    C_BLUE="\e[94m"
+    C_BLUE="\e[01;36;44m"
     C_MAGENTA="\e[95m"
     C_CYAN="\e[96m"
     C_WHITE="\e[97m"
