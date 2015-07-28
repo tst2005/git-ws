@@ -284,8 +284,15 @@ function read_projects()
     # Read line by line (discard comments and empty lines)
     while read line
     do
+        
         # Remove inline comments
-        line=$(sed -e 's/#.*$//' <<< "$line")
+	line="${line%%\#*}"
+        #line="$(sed -e 's/#.*$//' <<< "$line")"
+
+        if [ -z "$line" ]; then
+		# line is empty or start by a '#'
+		continue
+	fi
 
         # We get the directory
         dir=$(cut -d${FIELD_SEP} -f1 <<< "$line" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
